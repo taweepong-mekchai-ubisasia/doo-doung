@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ทำนายดวงชะตา</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Tokens ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:        #c9a84c;
+      --gold-lt:     #e8c97a;
+      --gold-10:     rgba(201,168,76,.10);
+      --gold-18:     rgba(201,168,76,.18);
+      --gold-30:     rgba(201,168,76,.30);
+      --gold-50:     rgba(201,168,76,.50);
+      --purple:      #7c3aed;
+      --accent:      #a78bfa;
+      --success:     #34d399;
+      --danger:      #f87171;
+      --bg:          #06060d;
+      --surf:        rgba(255,255,255,.045);
+      --surf2:       rgba(255,255,255,.07);
+      --bdr:         rgba(255,255,255,.09);
+      --text:        #f0efe d;
+      --text-sub:    rgba(240,239,237,.60);
+      --text-dim:    rgba(240,239,237,.38);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sarabun', system-ui, sans-serif;
+      background: var(--bg);
+      color: #f0efed;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Fixed background layers ─────────────────────────────── */
+    #bg-sky {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 140% 70% at 50% -10%, #110a2a 0%, #06060d 55%);
+    }
+
+    .nebula {
+      position: fixed; border-radius: 50%;
+      filter: blur(90px); pointer-events: none; z-index: 0;
+      animation: ndrift 22s ease-in-out infinite alternate;
+    }
+    @keyframes ndrift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(24px,16px) scale(1.06); }
+    }
+
+    #stars-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+
+    .sdot {
+      position: absolute; border-radius: 50%; background: #fff;
+      animation: twinkle var(--d,3s) ease-in-out infinite var(--dl,0s);
+    }
+    @keyframes twinkle {
+      0%,100% { opacity: var(--lo,.15); transform: scale(1); }
+      50%     { opacity: var(--hi,.8);  transform: scale(1.4); }
+    }
+
+    .star-settled {
+      position: absolute; pointer-events: none; user-select: none;
+      font-size: clamp(.65rem, 1.2vw, 1rem);
+      filter: drop-shadow(0 0 5px rgba(201,168,76,.65));
+      animation: stwinkle var(--d,4s) ease-in-out infinite var(--dl,0s);
+    }
+    @keyframes stwinkle {
+      0%,100% { opacity: .45; transform: scale(.88); }
+      50%     { opacity: 1;   transform: scale(1.18); }
+    }
+
+    .star-burst {
+      position: absolute; pointer-events: none;
+      font-size: 1.4rem;
+      filter: drop-shadow(0 0 8px rgba(201,168,76,.9));
+      animation: sburst 2.4s cubic-bezier(.22,.61,.36,1) forwards;
+    }
+    @keyframes sburst {
+      0%   { opacity: 0; transform: scale(.2) translateY(0); }
+      20%  { opacity: 1; transform: scale(1.5) translateY(-18px); }
+      65%  { opacity: 1; transform: scale(1)   translateY(-70px); }
+      100% { opacity: .6; transform: scale(.65) translateY(-120px); }
+    }
+
+    /* ── Page wrapper ────────────────────────────────────────── */
+    .page {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh;
+      padding: clamp(48px, 8vw, 80px) clamp(16px, 5vw, 32px) 80px;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .hdr { text-align: center; margin-bottom: clamp(36px, 6vw, 56px); }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: .7rem; font-weight: 700; letter-spacing: .22em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 18px;
+    }
+    .eyebrow::before, .eyebrow::after {
+      content: ''; display: block; width: 28px; height: 1px;
+    }
+    .eyebrow::before { background: linear-gradient(90deg, transparent, var(--gold)); }
+    .eyebrow::after  { background: linear-gradient(90deg, var(--gold), transparent); }
+
+    .hdr h1 {
+      font-size: clamp(2rem, 5.5vw, 3.2rem);
+      font-weight: 700; line-height: 1.12;
+      background: linear-gradient(145deg, #fff 25%, var(--gold-lt) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 12px;
+    }
+
+    .hdr p {
+      font-size: clamp(.9rem, 2vw, 1.05rem);
+      color: var(--text-sub); line-height: 1.6;
+      max-width: 380px; margin: 0 auto 20px;
+    }
+
+    .star-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 18px;
+      background: var(--gold-10); border: 1px solid var(--gold-30);
+      border-radius: 999px; font-size: .8rem; font-weight: 600;
+      color: var(--gold-lt); letter-spacing: .04em;
+      margin-bottom: 14px;
+    }
+
+    .admin-link {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 20px;
+      border: 1px solid var(--gold-30); border-radius: 999px;
+      font-size: .78rem; font-weight: 600; color: var(--gold);
+      text-decoration: none; background: var(--gold-10);
+      letter-spacing: .04em; transition: all .25s;
+    }
+    .admin-link:hover {
+      background: var(--gold-18);
+      box-shadow: 0 0 22px rgba(201,168,76,.18);
+      transform: translateY(-1px);
+    }
+    .admin-link svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    /* ── Form card ───────────────────────────────────────────── */
+    .card {
+      width: 100%; max-width: 460px;
+      background: var(--surf);
+      border: 1px solid var(--bdr);
+      border-radius: clamp(20px, 4vw, 28px);
+      padding: clamp(28px, 5vw, 44px) clamp(22px, 5vw, 40px);
+      backdrop-filter: blur(28px);
+      box-shadow:
+        0 2px 0 rgba(255,255,255,.04) inset,
+        0 12px 48px rgba(0,0,0,.55),
+        0 0 80px rgba(124,58,237,.07);
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-50), transparent);
+    }
+
+    .card-head { text-align: center; margin-bottom: 28px; }
+    .card-head .orb {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #a78bfa, #4c1d95);
+      box-shadow: 0 0 32px rgba(124,58,237,.5), 0 0 8px rgba(201,168,76,.3);
+      margin: 0 auto 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      animation: orb-pulse 4s ease-in-out infinite;
+    }
+    @keyframes orb-pulse {
+      0%,100% { box-shadow: 0 0 32px rgba(124,58,237,.5), 0 0 8px rgba(201,168,76,.3); }
+      50%     { box-shadow: 0 0 48px rgba(124,58,237,.7), 0 0 16px rgba(201,168,76,.5); }
+    }
+    .card-head h2 {
+      font-size: 1.25rem; font-weight: 700;
+      background: linear-gradient(135deg, #fff 30%, var(--gold-lt));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 4px;
+    }
+    .card-head p { font-size: .85rem; color: var(--text-dim); }
+
+    /* ── Alert ── */
+    .alert {
+      display: none; gap: 9px; align-items: flex-start;
+      padding: 12px 15px; border-radius: 11px; margin-bottom: 22px;
+      font-size: .87rem; font-weight: 500; line-height: 1.5;
+    }
+    .alert.success { display: flex; background: rgba(52,211,153,.09); color: #6ee7b7; border: 1px solid rgba(52,211,153,.22); }
+    .alert.fail    { display: flex; background: rgba(248,113,113,.09); color: #fca5a5; border: 1px solid rgba(248,113,113,.22); }
+
+    /* ── Form fields ── */
+    .fg { margin-bottom: 18px; }
+
+    .fg label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-sub); margin-bottom: 7px;
+    }
+    .fg label svg { width: 12px; height: 12px; color: var(--gold); flex-shrink: 0; }
+
+    .fg input {
+      width: 100%; padding: 13px 15px;
+      background: rgba(255,255,255,.05); border: 1px solid var(--bdr);
+      border-radius: 11px; font-size: .95rem; font-family: inherit;
+      color: #f0efed; outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    .fg input::placeholder { color: rgba(240,239,237,.2); }
+    .fg input:focus {
+      border-color: var(--gold-50);
+      background: rgba(255,255,255,.07);
+      box-shadow: 0 0 0 3px rgba(201,168,76,.09);
+    }
+    .fg input.err { border-color: rgba(248,113,113,.5); background: rgba(248,113,113,.05); }
+    .err-msg { color: #fca5a5; font-size: .76rem; margin-top: 5px; font-weight: 500; }
+
+    .sep { height: 1px; background: var(--bdr); margin: 22px 0; }
+
+    /* ── Submit ── */
+    .btn-go {
+      width: 100%; padding: 15px 20px;
+      background: linear-gradient(135deg, var(--gold) 0%, #9a6b22 100%);
+      color: #06060d; border: none; border-radius: 13px;
+      font-size: .95rem; font-weight: 700; font-family: inherit;
+      cursor: pointer; letter-spacing: .07em; text-transform: uppercase;
+      box-shadow: 0 4px 28px rgba(201,168,76,.32);
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+    }
+    .btn-go:hover:not(:disabled) {
+      opacity: .88; transform: translateY(-2px);
+      box-shadow: 0 8px 36px rgba(201,168,76,.44);
+    }
+    .btn-go:active:not(:disabled) { transform: translateY(0); }
+    .btn-go:disabled { opacity: .38; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-go svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+    .spin-ring {
+      width: 17px; height: 17px; flex-shrink: 0;
+      border: 2px solid rgba(6,6,13,.25); border-top-color: #06060d;
+      border-radius: 50%; animation: spin .65s linear infinite; display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Fortune modal ───────────────────────────────────────── */
+    .modal-bg {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,.78); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(12px, 4vw, 24px);
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+    }
+    .modal-bg.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      width: 100%; max-width: 540px;
+      max-height: calc(100vh - 40px);
+      background: #0c0a18;
+      border: 1px solid var(--bdr);
+      border-radius: clamp(18px, 4vw, 26px);
+      overflow: hidden; overflow-y: auto;
+      box-shadow: 0 28px 90px rgba(0,0,0,.75), 0 0 60px rgba(124,58,237,.12);
+      transform: scale(.93) translateY(20px);
+      transition: transform .38s cubic-bezier(.34,1.56,.64,1);
+      position: relative;
+      scrollbar-width: thin; scrollbar-color: var(--gold-30) transparent;
+    }
+    .modal::-webkit-scrollbar { width: 4px; }
+    .modal::-webkit-scrollbar-thumb { background: var(--gold-30); border-radius: 4px; }
+    .modal-bg.open .modal { transform: scale(1) translateY(0); }
+
+    .modal::before {
+      content: ''; position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-50), transparent);
+      z-index: 1;
+    }
+
+    .modal-body { padding: clamp(24px, 5vw, 40px) clamp(20px, 5vw, 36px); }
+
+    /* modal header */
+    .m-head { text-align: center; margin-bottom: 28px; }
+    .m-star-icon {
+      font-size: clamp(2.2rem, 6vw, 3rem);
+      display: block; margin-bottom: 12px;
+      animation: float 3.5s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+    .m-head h2 {
+      font-size: clamp(1.2rem, 3.5vw, 1.55rem); font-weight: 700;
+      background: linear-gradient(135deg, #fff 20%, var(--gold-lt));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 5px;
+    }
+    .m-head p { font-size: .85rem; color: var(--text-dim); line-height: 1.5; }
+
+    /* score grid */
+    .scores {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 20px;
+    }
+    .sc {
+      background: var(--surf); border: 1px solid var(--bdr);
+      border-radius: 14px; padding: 14px 15px;
+    }
+    .sc-lbl {
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 9px;
+    }
+    .sc-track {
+      height: 5px; background: rgba(255,255,255,.08);
+      border-radius: 999px; overflow: hidden; margin-bottom: 7px;
+    }
+    .sc-bar {
+      height: 100%; border-radius: 999px;
+      width: 0; transition: width 1.1s cubic-bezier(.22,.61,.36,1);
+    }
+    .sc-bar.luck  { background: linear-gradient(90deg, var(--gold), var(--gold-lt)); }
+    .sc-bar.love  { background: linear-gradient(90deg, #f472b6, #fb7185); }
+    .sc-bar.work  { background: linear-gradient(90deg, #60a5fa, #818cf8); }
+    .sc-bar.money { background: linear-gradient(90deg, #34d399, #6ee7b7); }
+    .sc-num { font-size: 1.15rem; font-weight: 700; color: #f0efed; }
+
+    /* lucky row */
+    .lucky-row {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .lk {
+      background: var(--gold-10); border: 1px solid var(--gold-30);
+      border-radius: 12px; padding: 12px 10px; text-align: center;
+    }
+    .lk-lbl { font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
+    .lk-val { font-size: .9rem; font-weight: 600; color: #f0efed; }
+
+    /* fortune sections */
+    .fsec { margin-bottom: 14px; }
+    .fsec-title {
+      font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 7px; display: flex; align-items: center; gap: 6px;
+    }
+    .fsec-body {
+      font-size: .9rem; color: var(--text-sub); line-height: 1.75;
+      background: var(--surf); border: 1px solid var(--bdr);
+      border-radius: 11px; padding: 13px 15px;
+    }
+
+    /* close btn */
+    .btn-close {
+      width: 100%; padding: 13px; margin-top: 22px;
+      background: var(--gold-10); border: 1px solid var(--gold-30);
+      border-radius: 12px; color: var(--gold-lt); font-family: inherit;
+      font-size: .88rem; font-weight: 600; cursor: pointer;
+      letter-spacing: .04em; transition: background .2s, box-shadow .2s;
+    }
+    .btn-close:hover { background: var(--gold-18); box-shadow: 0 0 24px rgba(201,168,76,.14); }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .scores { grid-template-columns: 1fr; }
+      .lucky-row { grid-template-columns: repeat(3,1fr); }
+    }
+    @media (max-width: 340px) {
+      .lucky-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<!-- bg -->
+<div id="bg-sky"></div>
+<div class="nebula" style="width:700px;height:500px;top:-150px;left:-200px;background:rgba(124,58,237,.13)"></div>
+<div class="nebula" style="width:500px;height:400px;bottom:-100px;right:-120px;background:rgba(201,168,76,.07);animation-delay:-11s"></div>
+<div class="nebula" style="width:400px;height:350px;top:45%;left:45%;background:rgba(167,139,250,.06);animation-delay:-6s"></div>
+<div id="stars-bg"></div>
+
+<div class="page">
+  <!-- header -->
+  <header class="hdr">
+    <div class="eyebrow">✦ ดวงชะตา ✦</div>
+    <h1>ค้นพบดวงของคุณ</h1>
+    <p>กรอกข้อมูลเพื่อรับการทำนายดวงชะตาเฉพาะตัว</p>
+    <div class="star-pill">✦ <span id="starCount">...</span> ดวงดาวบนท้องฟ้า</div>
+    <br>
+    <a href="/admin" class="admin-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+      ระบบหลังบ้าน
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </header>
+
+  <!-- form card -->
+  <div class="card">
+    <div class="card-head">
+      <div class="orb">🔮</div>
+      <h2>ทำนายดวงชะตา</h2>
+      <p>ดวงของคุณซ่อนอยู่ในชื่อและเบอร์โทร</p>
+    </div>
+
+    <div id="alert" class="alert"><span id="alertMsg"></span></div>
+
+    <form id="surveyForm" novalidate>
+      <div class="fg">
+        <label for="name">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+          ชื่อ-นามสกุล
+        </label>
+        <input type="text" id="name" placeholder="เช่น สมชาย ใจดี" autocomplete="name">
+        <div class="err-msg" id="nameErr"></div>
+      </div>
+      <div class="fg">
+        <label for="email">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          อีเมล์
+        </label>
+        <input type="email" id="email" placeholder="example@email.com" autocomplete="email">
+        <div class="err-msg" id="emailErr"></div>
+      </div>
+      <div class="fg">
+        <label for="phone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          เบอร์โทรศัพท์
+        </label>
+        <input type="tel" id="phone" placeholder="0812345678" autocomplete="tel">
+        <div class="err-msg" id="phoneErr"></div>
+      </div>
+      <div class="sep"></div>
+      <button type="submit" class="btn-go" id="submitBtn">
+        <span class="spin-ring" id="spinner"></span>
+        <svg id="btnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span id="btnText">ดูดวงของฉัน</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- fortune modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-body">
+      <div class="m-head">
+        <span class="m-star-icon">⭐</span>
+        <h2 id="mName">ดวงชะตาของคุณ</h2>
+        <p id="mSub">ธาตุ — · หินมงคล —</p>
+      </div>
+      <div class="scores">
+        <div class="sc"><div class="sc-lbl">✦ โชคลาภ</div><div class="sc-track"><div class="sc-bar luck" id="bLuck"></div></div><div class="sc-num" id="nLuck">—</div></div>
+        <div class="sc"><div class="sc-lbl">♥ ความรัก</div><div class="sc-track"><div class="sc-bar love" id="bLove"></div></div><div class="sc-num" id="nLove">—</div></div>
+        <div class="sc"><div class="sc-lbl">◈ การงาน</div><div class="sc-track"><div class="sc-bar work" id="bWork"></div></div><div class="sc-num" id="nWork">—</div></div>
+        <div class="sc"><div class="sc-lbl">$ การเงิน</div><div class="sc-track"><div class="sc-bar money" id="bMoney"></div></div><div class="sc-num" id="nMoney">—</div></div>
+      </div>
+      <div class="lucky-row">
+        <div class="lk"><div class="lk-lbl">เลขมงคล</div><div class="lk-val" id="lNum">—</div></div>
+        <div class="lk"><div class="lk-lbl">สีมงคล</div><div class="lk-val" id="lColor">—</div></div>
+        <div class="lk"><div class="lk-lbl">วันมงคล</div><div class="lk-val" id="lDay">—</div></div>
+      </div>
+      <div class="fsec"><div class="fsec-title">♥ ความรัก</div><div class="fsec-body" id="mLove">—</div></div>
+      <div class="fsec"><div class="fsec-title">◈ การงาน</div><div class="fsec-body" id="mWork">—</div></div>
+      <div class="fsec"><div class="fsec-title">$ การเงิน</div><div class="fsec-body" id="mMoney">—</div></div>
+      <button class="btn-close" id="btnClose">✦ รับทราบ — ปิดดูดวงดาว</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── tiny bg stars ─────────────────────────────────────────────
+(function(){
+  const l = document.getElementById('stars-bg');
+  for(let i=0;i<160;i++){
+    const s=document.createElement('div'); s.className='sdot';
+    const sz=Math.random()*2+.5;
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--d:${2+Math.random()*4}s;--dl:${Math.random()*5}s;--lo:${.08+Math.random()*.15};--hi:${.4+Math.random()*.55};`;
+    l.appendChild(s);
+  }
+})();
+
+// ── settled stars ─────────────────────────────────────────────
+function renderSettled(count){
+  const l=document.getElementById('stars-bg');
+  l.querySelectorAll('.star-settled').forEach(e=>e.remove());
+  const em=['⭐','🌟','✨','💫'];
+  for(let i=0;i<count;i++){
+    const seed=(i*9301+49297)%233280;
+    const el=document.createElement('div'); el.className='star-settled';
+    el.textContent=em[i%em.length];
+    el.style.cssText=`left:${seed%100}%;top:${(seed*7)%85+5}%;--d:${3+(seed%4)}s;--dl:${(seed%50)/10}s;`;
+    l.appendChild(el);
+  }
+}
+
+async function loadStars(){
+  try{
+    const d=await fetch('/api/stars').then(r=>r.json());
+    document.getElementById('starCount').textContent=d.count;
+    renderSettled(d.count);
+  }catch{}
+}
+loadStars();
+
+// ── form ──────────────────────────────────────────────────────
+document.getElementById('surveyForm').addEventListener('submit',async e=>{
+  e.preventDefault(); clearErr();
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  let ok=true;
+  if(!name){showErr('name','กรุณากรอกชื่อ-นามสกุล');ok=false;}
+  if(!email){showErr('email','กรุณากรอกอีเมล์');ok=false;}
+  if(!phone){showErr('phone','กรุณากรอกเบอร์โทร');ok=false;}
+  if(!ok)return;
+  setLoad(true);
+  try{
+    const res=await fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,phone})});
+    const data=await res.json();
+    if(!res.ok){showAlert(data.error||'เกิดข้อผิดพลาด','fail');return;}
+    const fortune=await fetch('/api/fortune?'+new URLSearchParams({name,phone})).then(r=>r.json());
+    if(data.isNew){
+      spawnBurst(()=>{loadStars();openModal(fortune,name,phone);});
+    } else {
+      openModal(fortune,name,phone);
+    }
+    document.getElementById('surveyForm').reset();
+  }catch{showAlert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้','fail');}
+  finally{setLoad(false);}
+});
+
+function setLoad(on){
+  document.getElementById('submitBtn').disabled=on;
+  document.getElementById('spinner').style.display=on?'block':'none';
+  document.getElementById('btnIcon').style.display=on?'none':'block';
+  document.getElementById('btnText').textContent=on?'กำลังอ่านดวง...':'ดูดวงของฉัน';
+}
+function showErr(f,m){document.getElementById(f).classList.add('err');document.getElementById(f+'Err').textContent=m;}
+function clearErr(){
+  ['name','email','phone'].forEach(f=>{document.getElementById(f).classList.remove('err');document.getElementById(f+'Err').textContent='';});
+  document.getElementById('alert').className='alert';
+}
+function showAlert(m,t){document.getElementById('alertMsg').textContent=m;document.getElementById('alert').className='alert '+t;}
+
+function spawnBurst(cb){
+  const l=document.getElementById('stars-bg');
+  const el=document.createElement('div'); el.className='star-burst';
+  el.textContent=['⭐','🌟','✨','💫'][Math.floor(Math.random()*4)];
+  el.style.left=(30+Math.random()*40)+'%'; el.style.top=(40+Math.random()*30)+'%';
+  l.appendChild(el);
+  setTimeout(()=>{el.remove();if(cb)cb();},2500);
+}
+
+// ── modal ─────────────────────────────────────────────────────
+function openModal(f,name,phone){
+  document.getElementById('mName').textContent='ดวงชะตาของ '+f.name;
+  document.getElementById('mSub').textContent='ธาตุ '+f.element+' · หินมงคล '+f.stone;
+  document.getElementById('lNum').textContent=f.luckyNumber;
+  document.getElementById('lColor').textContent=f.luckyColor;
+  document.getElementById('lDay').textContent=f.luckyDay;
+  document.getElementById('mLove').textContent=f.messages.love;
+  document.getElementById('mWork').textContent=f.messages.work;
+  document.getElementById('mMoney').textContent=f.messages.money;
+  ['Luck','Love','Work','Money'].forEach(k=>{
+    document.getElementById('b'+k).style.width='0';
+    document.getElementById('n'+k).textContent='—';
+  });
+  document.getElementById('modalBg').classList.add('open');
+  // log the view
+  fetch('/api/fortune/log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,phone})}).catch(()=>{});
+  setTimeout(()=>{
+    const s=f.scores;
+    [['Luck',s.luck],['Love',s.love],['Work',s.work],['Money',s.money]].forEach(([k,v])=>{
+      document.getElementById('b'+k).style.width=v+'%';
+      document.getElementById('n'+k).textContent=v;
+    });
+  },200);
+}
+
+document.getElementById('btnClose').addEventListener('click',()=>document.getElementById('modalBg').classList.remove('open'));
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById('modalBg').classList.remove('open');});
+</script>
+
+<!-- Hot Reload -->
+<script>
+(function(){
+  const ws=new WebSocket('ws://localhost:3001');
+  ws.onmessage=e=>{const d=JSON.parse(e.data);if(d.type==='reload')location.reload();};
+  ws.onclose=()=>setTimeout(()=>location.reload(),1500);
+})();
+</script>
+</body>
+</html>

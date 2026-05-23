@@ -1,0 +1,14 @@
+{
+  "name": "survey-app",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "better-sqlite3": "^12.10.0",
+    "express": "^4.22.2",
+    "express-session": "^1.19.0"
+  },
+  "devDependencies": {
+    "chokidar": "^5.0.0",
+    "ws": "^8.21.0"
+  }
+}

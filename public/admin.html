@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — แบบสอบถาม</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: rgba(201,168,76,0.12);
+      --gold-dim2: rgba(201,168,76,0.2);
+      --accent: #a78bfa;
+      --success: #34d399;
+      --danger: #f87171;
+      --warn: #fbbf24;
+      --bg: #0a0a0f;
+      --surface: rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --border-gold: rgba(201,168,76,0.25);
+      --text: #f1f0ee;
+      --text-muted: rgba(241,240,238,0.4);
+      --text-sub: rgba(241,240,238,0.6);
+      --sidebar-w: 256px;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Sarabun', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 5%,  rgba(124,58,237,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 85% 85%, rgba(201,168,76,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 50% at 55% 40%, rgba(167,139,250,0.05) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ════════════════════════════════
+       LOGIN
+    ════════════════════════════════ */
+    #loginOverlay {
+      position: fixed; inset: 0; z-index: 999;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+    }
+
+    #loginOverlay::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 30% 20%, rgba(124,58,237,0.2) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 75% 80%, rgba(201,168,76,0.1) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .login-box {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 400px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 48px 40px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+      overflow: hidden;
+    }
+
+    .login-box::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.6), transparent);
+    }
+
+    .login-logo {
+      text-align: center; margin-bottom: 32px;
+    }
+
+    .login-logo .logo-ring {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--gold-dim);
+      border: 1px solid var(--border-gold);
+      margin-bottom: 16px;
+    }
+
+    .login-logo .logo-ring svg { width: 28px; height: 28px; color: var(--gold); }
+
+    .login-logo h2 {
+      font-size: 1.5rem; font-weight: 700;
+      background: linear-gradient(135deg, #fff 30%, var(--gold-light) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .login-logo p { color: var(--text-muted); font-size: 0.88rem; margin-top: 4px; }
+
+    .login-field { margin-bottom: 18px; }
+
+    .login-field label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-sub); margin-bottom: 8px;
+    }
+
+    .login-field label svg { width: 13px; height: 13px; color: var(--gold); }
+
+    .login-field input {
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px; font-size: 0.95rem; font-family: inherit;
+      color: var(--text); outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+
+    .login-field input::placeholder { color: rgba(241,240,238,0.2); }
+
+    .login-field input:focus {
+      border-color: rgba(201,168,76,0.5);
+      background: rgba(255,255,255,0.07);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+    }
+
+    .login-err {
+      min-height: 20px; margin-top: 14px;
+      color: #fca5a5; font-size: 0.82rem; text-align: center; font-weight: 500;
+    }
+
+    .btn-login {
+      width: 100%; padding: 14px; margin-top: 6px;
+      background: linear-gradient(135deg, var(--gold) 0%, #a0722a 100%);
+      color: #0a0a0f; border: none; border-radius: 12px;
+      font-size: 0.9rem; font-weight: 700; font-family: inherit; cursor: pointer;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+    }
+
+    .btn-login:hover:not(:disabled) { opacity: .9; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,168,76,0.4); }
+    .btn-login:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ════════════════════════════════
+       APP LAYOUT
+    ════════════════════════════════ */
+    #app { display: none; min-height: 100vh; position: relative; z-index: 1; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w);
+      background: rgba(255,255,255,0.03);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+
+    .sidebar::after {
+      content: '';
+      position: absolute; top: 0; right: 0; bottom: 0; width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(201,168,76,0.3) 30%, rgba(201,168,76,0.3) 70%, transparent);
+      pointer-events: none;
+    }
+
+    .sidebar-brand {
+      padding: 28px 24px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-mark {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 4px;
+    }
+
+    .brand-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--gold-dim);
+      border: 1px solid var(--border-gold);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-icon svg { width: 18px; height: 18px; color: var(--gold); }
+
+    .brand-text h1 { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .brand-text p  { font-size: 0.75rem; color: var(--text-muted); margin-top: 1px; }
+
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+
+    .nav-label {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-muted);
+      padding: 0 12px; margin: 16px 0 6px;
+    }
+
+    .nav-label:first-child { margin-top: 4px; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px; cursor: pointer;
+      color: var(--text-sub); font-size: 0.9rem; font-weight: 500;
+      transition: background .15s, color .15s; margin-bottom: 2px;
+      position: relative;
+    }
+
+    .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.7; }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item:hover svg { opacity: 1; }
+
+    .nav-item.active {
+      background: var(--gold-dim);
+      color: var(--gold-light);
+      border: 1px solid var(--border-gold);
+    }
+
+    .nav-item.active svg { opacity: 1; color: var(--gold); }
+
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+
+    .footer-btn {
+      display: flex; align-items: center; gap: 9px; width: 100%;
+      padding: 9px 12px; border-radius: 10px; font-family: inherit;
+      font-size: 0.85rem; font-weight: 500; cursor: pointer;
+      transition: background .15s, color .15s; text-decoration: none;
+      border: 1px solid transparent;
+    }
+
+    .footer-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .footer-btn.home {
+      background: var(--gold-dim); color: var(--gold-light);
+      border-color: var(--border-gold);
+    }
+
+    .footer-btn.home:hover { background: var(--gold-dim2); }
+
+    .footer-btn.logout {
+      background: transparent; color: var(--text-sub);
+      border-color: var(--border);
+    }
+
+    .footer-btn.logout:hover { background: rgba(248,113,113,0.08); color: #fca5a5; border-color: rgba(248,113,113,0.2); }
+
+    /* ── Main ── */
+    .main { margin-left: var(--sidebar-w); padding: 36px 32px; min-height: 100vh; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-eyebrow {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 6px;
+    }
+
+    .page-title { font-size: 1.7rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .page-sub   { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 32px; }
+
+    /* ── Stats ── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 22px 24px;
+      backdrop-filter: blur(12px);
+      position: relative; overflow: hidden;
+      transition: border-color .2s, background .2s;
+    }
+
+    .stat-card:hover { background: var(--surface2); border-color: var(--border-gold); }
+
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+    }
+
+    .stat-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+
+    .stat-icon-wrap {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-icon-wrap svg { width: 18px; height: 18px; }
+    .stat-icon-wrap.gold   { background: var(--gold-dim);              border: 1px solid var(--border-gold); }
+    .stat-icon-wrap.gold   svg { color: var(--gold); }
+    .stat-icon-wrap.green  { background: rgba(52,211,153,0.1);         border: 1px solid rgba(52,211,153,0.2); }
+    .stat-icon-wrap.green  svg { color: var(--success); }
+    .stat-icon-wrap.purple { background: rgba(167,139,250,0.1);        border: 1px solid rgba(167,139,250,0.2); }
+    .stat-icon-wrap.purple svg { color: var(--accent); }
+
+    .stat-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+    .stat-value { font-size: 2.2rem; font-weight: 700; color: var(--text); line-height: 1; margin-top: 4px; }
+    .stat-desc  { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; }
+
+    /* ── Latest card ── */
+    .latest-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; padding: 20px 24px;
+      backdrop-filter: blur(12px); margin-bottom: 32px;
+      position: relative; overflow: hidden;
+    }
+
+    .latest-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+    }
+
+    .latest-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .latest-value { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap; margin-bottom: 16px;
+    }
+
+    .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 340px; }
+
+    .search-wrap input {
+      width: 100%; padding: 10px 14px 10px 38px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; font-size: 0.88rem; font-family: inherit;
+      color: var(--text); outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+
+    .search-wrap input::placeholder { color: var(--text-muted); }
+
+    .search-wrap input:focus {
+      border-color: rgba(201,168,76,0.4);
+      background: var(--surface2);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.06);
+    }
+
+    .search-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: var(--text-muted);
+    }
+
+    .search-icon svg { width: 15px; height: 15px; display: block; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 18px; border-radius: 10px; font-size: 0.85rem;
+      font-family: inherit; font-weight: 600; cursor: pointer; border: none;
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+      letter-spacing: 0.02em; white-space: nowrap;
+    }
+
+    .btn svg { width: 15px; height: 15px; }
+    .btn:hover:not(:disabled) { opacity: .88; transform: translateY(-1px); }
+    .btn:active:not(:disabled) { transform: translateY(0); }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, #a0722a 100%);
+      color: #0a0a0f;
+      box-shadow: 0 4px 16px rgba(201,168,76,0.25);
+    }
+
+    .btn-danger {
+      background: rgba(248,113,113,0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(248,113,113,0.2);
+    }
+
+    .btn-danger:hover:not(:disabled) { background: rgba(248,113,113,0.2); }
+
+    .btn-ghost {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-sub);
+    }
+
+    .btn-ghost:hover:not(:disabled) { border-color: var(--border-gold); color: var(--gold); background: var(--gold-dim); }
+
+    .btn-sm { padding: 6px 12px; font-size: 0.78rem; border-radius: 8px; }
+
+    /* ── Table ── */
+    .table-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .table-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead tr { background: rgba(255,255,255,0.03); }
+
+    th {
+      color: var(--gold); padding: 14px 18px; text-align: left;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.88rem; color: var(--text-sub); vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background .12s; }
+    tbody tr:hover td { background: rgba(255,255,255,0.03); color: var(--text); }
+
+    .td-id    { color: var(--text-muted); font-size: 0.78rem; width: 50px; }
+    .td-name  { font-weight: 600; color: var(--text); }
+    .td-email { color: var(--accent); font-size: 0.83rem; }
+    .td-phone { font-family: 'Inter', monospace; font-size: 0.83rem; letter-spacing: 0.04em; }
+    .td-date  { color: var(--text-muted); font-size: 0.78rem; white-space: nowrap; }
+    .td-act   { white-space: nowrap; }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-top: 1px solid var(--border);
+      flex-wrap: wrap; gap: 8px;
+    }
+
+    .page-info { font-size: 0.82rem; color: var(--text-muted); }
+
+    .page-btns { display: flex; gap: 4px; }
+
+    .page-btn {
+      padding: 5px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface);
+      font-family: inherit; font-size: 0.82rem; color: var(--text-sub);
+      cursor: pointer; transition: all .15s;
+    }
+
+    .page-btn:hover:not(:disabled) { border-color: var(--border-gold); color: var(--gold); background: var(--gold-dim); }
+    .page-btn.active { background: var(--gold-dim); border-color: var(--border-gold); color: var(--gold-light); font-weight: 700; }
+    .page-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+    /* ── Empty ── */
+    .empty-state { text-align: center; padding: 60px 24px; }
+    .empty-state .empty-icon { font-size: 2rem; color: var(--text-muted); margin-bottom: 12px; opacity: 0.4; }
+    .empty-state p { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 500; opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: #13131a; border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px; max-width: 420px; width: 90%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+      transform: scale(.96) translateY(8px); transition: transform .2s;
+      position: relative; overflow: hidden;
+    }
+
+    .modal::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(248,113,113,0.5), transparent);
+    }
+
+    .modal-backdrop.open .modal { transform: scale(1) translateY(0); }
+
+    .modal-icon { font-size: 2rem; margin-bottom: 14px; }
+    .modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+    .modal p  { color: var(--text-sub); font-size: 0.88rem; margin-bottom: 28px; line-height: 1.7; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      padding: 12px 20px; border-radius: 12px; font-size: 0.88rem; font-weight: 600;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transform: translateY(80px) scale(0.95); opacity: 0;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+      pointer-events: none; display: flex; align-items: center; gap: 8px;
+    }
+
+    #toast svg { width: 16px; height: 16px; flex-shrink: 0; }
+    #toast.show { transform: translateY(0) scale(1); opacity: 1; }
+    #toast.success { background: rgba(52,211,153,0.12); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.25); }
+    #toast.error   { background: rgba(248,113,113,0.12); color: #fca5a5; border: 1px solid rgba(248,113,113,0.25); }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 0.7s linear infinite; }
+
+    @media (max-width: 768px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════
+     LOGIN
+════════════════════════════════ -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-ring">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h2>Admin Panel</h2>
+      <p>ระบบจัดการแบบสอบถาม</p>
+    </div>
+
+    <div class="login-field">
+      <label>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+        ชื่อผู้ใช้
+      </label>
+      <input type="text" id="loginUser" placeholder="admin" autocomplete="username">
+    </div>
+
+    <div class="login-field">
+      <label>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        รหัสผ่าน
+      </label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <div class="login-err" id="loginErr"></div>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">เข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     APP
+════════════════════════════════ -->
+<div id="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Survey Admin</h1>
+          <p>ระบบจัดการ</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">เมนูหลัก</div>
+
+      <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+
+      <div class="nav-item" onclick="showPage('responses')" id="nav-responses">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        ข้อมูลทั้งหมด
+      </div>
+
+      <div class="nav-item" onclick="showPage('fortune')" id="nav-fortune">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        สถิติดูดวง
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/" class="footer-btn home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        หน้าแบบสอบถาม
+      </a>
+      <button class="footer-btn logout" onclick="doLogout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        ออกจากระบบ
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-eyebrow">Overview</div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">ภาพรวมข้อมูลแบบสอบถาม</div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-top">
+            <div>
+              <div class="stat-label">ทั้งหมด</div>
+              <div class="stat-value" id="statTotal">—</div>
+            </div>
+            <div class="stat-icon-wrap gold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+          </div>
+          <div class="stat-desc">การตอบกลับทั้งหมด</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-top">
+            <div>
+              <div class="stat-label">วันนี้</div>
+              <div class="stat-value" id="statToday">—</div>
+            </div>
+            <div class="stat-icon-wrap green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+          </div>
+          <div class="stat-desc">การตอบกลับวันนี้</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-top">
+            <div>
+              <div class="stat-label">7 วันล่าสุด</div>
+              <div class="stat-value" id="statWeek">—</div>
+            </div>
+            <div class="stat-icon-wrap purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+          </div>
+          <div class="stat-desc">การตอบกลับ 7 วัน</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-top">
+            <div>
+              <div class="stat-label">ดูดวงทั้งหมด</div>
+              <div class="stat-value" id="statTotalViews">—</div>
+            </div>
+            <div class="stat-icon-wrap" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+          </div>
+          <div class="stat-desc">ครั้งที่เปิดดูดวงรวม</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-top">
+            <div>
+              <div class="stat-label">ดูดวงวันนี้</div>
+              <div class="stat-value" id="statTodayViews">—</div>
+            </div>
+            <div class="stat-icon-wrap" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </div>
+          </div>
+          <div class="stat-desc">ครั้งที่เปิดดูดวงวันนี้</div>
+        </div>
+      </div>
+
+      <div class="latest-card">
+        <div class="latest-label">การตอบกลับล่าสุด</div>
+        <div class="latest-value" id="statLatest">—</div>
+      </div>
+    </div>
+
+    <!-- Responses -->
+    <div class="page" id="page-responses">
+      <div class="page-eyebrow">Data</div>
+      <div class="page-title">ข้อมูลทั้งหมด</div>
+      <div class="page-sub">จัดการและดูข้อมูลผู้ตอบแบบสอบถาม</div>
+
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input type="text" id="searchInput" placeholder="ค้นหาชื่อ, อีเมล์, เบอร์โทร..." oninput="onSearch()">
+        </div>
+        <button class="btn btn-gold" onclick="exportCSV()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+        <button class="btn btn-danger" onclick="confirmDeleteAll()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          ลบทั้งหมด
+        </button>
+        <button class="btn btn-ghost" onclick="loadResponses()">
+          <svg id="refreshIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+          รีเฟรช
+        </button>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>ชื่อ-นามสกุล</th><th>อีเมล์</th><th>เบอร์โทร</th><th>วันที่</th><th></th></tr>
+          </thead>
+          <tbody id="respBody"></tbody>
+        </table>
+        <div class="pagination" id="paginationBar"></div>
+      </div>
+    </div>
+
+    <!-- Fortune Stats -->
+    <div class="page" id="page-fortune">
+      <div class="page-eyebrow">Analytics</div>
+      <div class="page-title">สถิติดูดวง</div>
+      <div class="page-sub">วิเคราะห์พฤติกรรมการดูดวงของผู้ใช้</div>
+
+      <div class="stats-grid" style="margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-top">
+            <div><div class="stat-label">ดูดวงทั้งหมด</div><div class="stat-value" id="fTotalViews">—</div></div>
+            <div class="stat-icon-wrap" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+          </div>
+          <div class="stat-desc">ครั้งรวมทั้งหมด</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div><div class="stat-label">ผู้ดูดวง</div><div class="stat-value" id="fUniqueViewers">—</div></div>
+            <div class="stat-icon-wrap green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+          </div>
+          <div class="stat-desc">คนที่เคยดูดวง</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div><div class="stat-label">เฉลี่ย/คน</div><div class="stat-value" id="fAvgViews">—</div></div>
+            <div class="stat-icon-wrap purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+          </div>
+          <div class="stat-desc">ครั้งดูดวงต่อคน</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div><div class="stat-label">ชั่วโมง Peak</div><div class="stat-value" id="fPeakHour">—</div></div>
+            <div class="stat-icon-wrap gold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+          </div>
+          <div class="stat-desc">ชั่วโมงที่ดูดวงมากสุด</div>
+        </div>
+      </div>
+
+      <div class="table-card" style="padding:24px;margin-bottom:24px">
+        <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:16px">ยอดดูดวง 14 วันล่าสุด</div>
+        <div id="dailyChart" style="display:flex;align-items:flex-end;gap:5px;height:90px;padding:0 4px"></div>
+        <div id="dailyLabels" style="display:flex;gap:5px;margin-top:6px;padding:0 4px"></div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr><th>อันดับ</th><th>ชื่อ-นามสกุล</th><th>เบอร์โทร</th><th>ดูดวง (ครั้ง)</th><th>ล่าสุด</th></tr>
+          </thead>
+          <tbody id="topViewersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-icon" id="modalIcon">⚠️</div>
+    <h3 id="modalTitle">ยืนยันการลบ</h3>
+    <p id="modalMsg">คุณแน่ใจหรือไม่?</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-danger" id="modalConfirmBtn">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+  let currentPage = 1, searchTimer = null;
+
+  // ── Init ──────────────────────────────────────────────────────
+  (async () => {
+    const r = await fetch('/api/admin/me');
+    const d = await r.json();
+    if (d.isAdmin) showApp();
+  })();
+
+  document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  // ── Auth ──────────────────────────────────────────────────────
+  async function doLogin() {
+    const btn  = document.getElementById('loginBtn');
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    document.getElementById('loginErr').textContent = '';
+    btn.disabled = true; btn.textContent = 'กำลังเข้าสู่ระบบ...';
+    try {
+      const r = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: user, password: pass }) });
+      const d = await r.json();
+      if (r.ok) showApp();
+      else document.getElementById('loginErr').textContent = d.error;
+    } catch { document.getElementById('loginErr').textContent = 'ไม่สามารถเชื่อมต่อได้'; }
+    finally { btn.disabled = false; btn.textContent = 'เข้าสู่ระบบ'; }
+  }
+
+  async function doLogout() {
+    await fetch('/api/admin/logout', { method: 'POST' });
+    location.reload();
+  }
+
+  function showApp() {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadStats(); loadResponses();
+  }
+
+  // ── Navigation ────────────────────────────────────────────────
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.getElementById('nav-' + name).classList.add('active');
+    if (name === 'dashboard') loadStats();
+    if (name === 'responses') loadResponses();
+    if (name === 'fortune')   loadFortuneStats();
+  }
+
+  // ── Stats ─────────────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const r = await fetch('/api/admin/stats');
+      if (r.status === 401) return;
+      const d = await r.json();
+      document.getElementById('statTotal').textContent = d.total;
+      document.getElementById('statToday').textContent = d.today;
+      document.getElementById('statWeek').textContent  = d.week;
+      document.getElementById('statTotalViews').textContent = d.totalViews ?? '—';
+      document.getElementById('statTodayViews').textContent = d.todayViews ?? '—';
+      document.getElementById('statLatest').textContent = d.latest
+        ? new Date(d.latest).toLocaleString('th-TH', { dateStyle: 'full', timeStyle: 'short' })
+        : 'ยังไม่มีข้อมูล';
+    } catch {}
+  }
+
+  // ── Responses ─────────────────────────────────────────────────
+  async function loadResponses(page = currentPage) {
+    currentPage = page;
+    const search = document.getElementById('searchInput').value.trim();
+    document.getElementById('refreshIcon').classList.add('spin');
+    try {
+      const r = await fetch('/api/admin/responses?' + new URLSearchParams({ page, limit: 15, search }));
+      if (r.status === 401) return;
+      const d = await r.json();
+      renderTable(d); renderPagination(d);
+    } catch {}
+    finally { document.getElementById('refreshIcon').classList.remove('spin'); }
+  }
+
+  function renderTable({ rows }) {
+    const tbody = document.getElementById('respBody');
+    if (!rows.length) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">◈</div><p>ไม่พบข้อมูล</p></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td class="td-id">${r.id}</td>
+        <td class="td-name">${esc(r.name)}</td>
+        <td class="td-email">${esc(r.email)}</td>
+        <td class="td-phone">${esc(r.phone)}</td>
+        <td class="td-date">${new Date(r.created_at).toLocaleString('th-TH', { dateStyle:'short', timeStyle:'short' })}</td>
+        <td class="td-act">
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete(${r.id},'${esc(r.name)}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            ลบ
+          </button>
+        </td>
+      </tr>`).join('');
+  }
+
+  function renderPagination({ total, page, pages, limit }) {
+    const bar  = document.getElementById('paginationBar');
+    const from = total ? (page - 1) * limit + 1 : 0;
+    const to   = Math.min(page * limit, total);
+    let btns = '';
+    for (let i = 1; i <= pages; i++) {
+      if (pages > 7 && i > 2 && i < pages - 1 && Math.abs(i - page) > 1) {
+        if (i === 3 || i === pages - 2) btns += `<span style="padding:5px 4px;color:var(--text-muted)">…</span>`;
+        continue;
+      }
+      btns += `<button class="page-btn ${i === page ? 'active' : ''}" onclick="loadResponses(${i})">${i}</button>`;
+    }
+    bar.innerHTML = `
+      <span class="page-info">แสดง ${from}–${to} จาก ${total} รายการ</span>
+      <div class="page-btns">
+        <button class="page-btn" onclick="loadResponses(${page-1})" ${page<=1?'disabled':''}>‹</button>
+        ${btns}
+        <button class="page-btn" onclick="loadResponses(${page+1})" ${page>=pages?'disabled':''}>›</button>
+      </div>`;
+  }
+
+  function onSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadResponses(1), 350); }
+
+  // ── Delete ────────────────────────────────────────────────────
+  function confirmDelete(id, name) {
+    openModal('ยืนยันการลบ', `ต้องการลบข้อมูลของ "${name}" ใช่หรือไม่?\nการกระทำนี้ไม่สามารถย้อนกลับได้`, async () => {
+      const r = await fetch('/api/admin/responses/' + id, { method: 'DELETE' });
+      r.ok ? (toast('ลบข้อมูลสำเร็จ', 'success'), loadResponses(), loadStats()) : toast('เกิดข้อผิดพลาด', 'error');
+    });
+  }
+
+  function confirmDeleteAll() {
+    openModal('ลบข้อมูลทั้งหมด', 'ต้องการลบข้อมูลทั้งหมดออกจากระบบ?\nการกระทำนี้ไม่สามารถย้อนกลับได้', async () => {
+      const r = await fetch('/api/admin/responses', { method: 'DELETE' });
+      r.ok ? (toast('ลบข้อมูลทั้งหมดสำเร็จ', 'success'), loadResponses(), loadStats()) : toast('เกิดข้อผิดพลาด', 'error');
+    });
+  }
+
+  function exportCSV() { window.location.href = '/api/admin/export'; }
+
+  // ── Modal ─────────────────────────────────────────────────────
+  function openModal(title, msg, onConfirm) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalMsg').textContent   = msg;
+    document.getElementById('modalConfirmBtn').onclick = () => { closeModal(); onConfirm(); };
+    document.getElementById('modal').classList.add('open');
+  }
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+  document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+  // ── Toast ─────────────────────────────────────────────────────
+  let toastTimer;
+  function toast(msg, type = 'success') {
+    const el = document.getElementById('toast');
+    const icon = type === 'success'
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    el.innerHTML = icon + msg;
+    el.className = 'show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.className = '', 3000);
+  }
+
+  // ── Fortune Stats ─────────────────────────────────────────────
+  async function loadFortuneStats() {
+    try {
+      const r = await fetch('/api/admin/fortune-stats');
+      if (r.status === 401) return;
+      const d = await r.json();
+
+      document.getElementById('fTotalViews').textContent    = d.totalViews;
+      document.getElementById('fUniqueViewers').textContent = d.uniqueViewers;
+      document.getElementById('fAvgViews').textContent      = d.avgViews;
+      document.getElementById('fPeakHour').textContent      = d.peakHour ? d.peakHour.hour + ':00' : '—';
+
+      // daily bar chart
+      const chart  = document.getElementById('dailyChart');
+      const labels = document.getElementById('dailyLabels');
+      chart.innerHTML = ''; labels.innerHTML = '';
+
+      const days = [];
+      for (let i = 13; i >= 0; i--) {
+        const dt = new Date(); dt.setDate(dt.getDate() - i);
+        const key = dt.toISOString().slice(0, 10);
+        const found = d.dailyViews.find(x => x.day === key);
+        days.push({ day: key, count: found ? found.count : 0 });
+      }
+
+      const maxCount = Math.max(...days.map(x => x.count), 1);
+
+      days.forEach(({ day, count }) => {
+        const pct = Math.max((count / maxCount) * 100, count > 0 ? 5 : 0);
+        const bar = document.createElement('div');
+        bar.title = day + ': ' + count + ' ครั้ง';
+        bar.style.cssText = `flex:1;min-width:0;height:${pct}%;background:${count > 0 ? 'linear-gradient(180deg,rgba(201,168,76,.9),rgba(201,168,76,.35))' : 'rgba(255,255,255,.06)'};border-radius:4px 4px 0 0;position:relative;cursor:default;transition:height .6s cubic-bezier(.22,.61,.36,1);`;
+        if (count > 0) {
+          const tip = document.createElement('div');
+          tip.textContent = count;
+          tip.style.cssText = `position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:.6rem;font-weight:700;color:#e8c97a;white-space:nowrap;`;
+          bar.appendChild(tip);
+        }
+        chart.appendChild(bar);
+
+        const lbl = document.createElement('div');
+        const dt2 = new Date(day + 'T00:00:00');
+        lbl.textContent = (dt2.getMonth()+1) + '/' + dt2.getDate();
+        lbl.style.cssText = `flex:1;min-width:0;font-size:.58rem;color:var(--text-muted);text-align:center;overflow:hidden;`;
+        labels.appendChild(lbl);
+      });
+
+      // top viewers table
+      const tbody = document.getElementById('topViewersBody');
+      if (!d.topViewers.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">◈</div><p>ยังไม่มีข้อมูล</p></div></td></tr>`;
+        return;
+      }
+      const medals = ['🥇','🥈','🥉'];
+      tbody.innerHTML = d.topViewers.map((row, i) => `
+        <tr>
+          <td class="td-id" style="font-size:1.1rem;text-align:center">${medals[i] ?? (i+1)}</td>
+          <td class="td-name">${esc(row.name)}</td>
+          <td class="td-phone">${esc(row.phone)}</td>
+          <td style="text-align:center">
+            <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);border-radius:999px;padding:3px 12px;font-size:.82rem;font-weight:700;color:#e8c97a;">
+              ⭐ ${row.view_count}
+            </span>
+          </td>
+          <td class="td-date">${row.last_viewed ? new Date(row.last_viewed).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'}) : '—'}</td>
+        </tr>`).join('');
+    } catch(e) { console.error(e); }
+  }
+
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+
+<!-- Hot Reload -->
+<script>
+  (function() {
+    const ws = new WebSocket('ws://localhost:3001');
+    ws.onmessage = e => { const d = JSON.parse(e.data); if (d.type === 'reload') location.reload(); };
+    ws.onclose   = () => setTimeout(() => location.reload(), 1500);
+  })();
+</script>
+</body>
+</html>
